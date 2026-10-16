@@ -23,7 +23,7 @@ Implementation: `backend/LuxePups.Api/Services/EmailService.cs`.
 | `Smtp__UseStartTls` | `false` | `true` |
 | `Smtp__FromAddress` | `noreply@luxepupsutah.com` | same |
 | `Smtp__FromName` | `Luxe Pups Grooming` | same |
-| `Smtp__OwnerNotificationEmail` | `ahenriquez200528@gmail.com` | the owner's real inbox |
+| `Smtp__OwnerNotificationEmail` | `Luxepupsut@gmail.com` | the owner's real inbox |
 
 ## Local dev — Mailpit
 
@@ -54,7 +54,7 @@ that handles `POST /bookings` and sends both emails through Resend's HTTP API.
 
 - Security: origin allowlist (`ALLOWED_ORIGINS`), honeypot field, 8 KB body cap, field length
   limits, HTML escaping, per-IP rate limit (5/min), API key only in Worker secrets.
-- Owner notification goes to `OWNER_EMAIL` (ahenriquez200528@gmail.com) with `Reply-To` = customer.
+- Owner notification goes to `OWNER_EMAIL` (Luxepupsut@gmail.com) with `Reply-To` = customer.
 
 One-time setup:
 1. Resend: add `luxepupsutah.com` as a domain, add the DNS records it lists in Cloudflare DNS

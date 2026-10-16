@@ -16,7 +16,7 @@ Admins who can log into the admin panel (`#/admin`).
 | IsOwner | bool | seeded owner cannot be deleted |
 | CreatedAt | timestamptz | |
 
-Seeded on startup: `ahenriquez200528@gmail.com` (IsOwner = true). Password comes from
+Seeded on startup: `Luxepupsut@gmail.com` (IsOwner = true). Password comes from
 env `ADMIN_SEED_PASSWORD` (only used when the row does not exist yet). Any admin can add
 more admins; nobody can delete the owner or themselves.
 

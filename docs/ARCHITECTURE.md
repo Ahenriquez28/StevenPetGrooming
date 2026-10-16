@@ -30,7 +30,7 @@ Luxe Pups Grooming (`luxepupsutah.com`) — mobile dog grooming business site + 
   The public page stays exactly as it was at `/`; the admin panel is lazy-loaded.
 - **Auth:** custom minimal JWT (BCrypt password hashes) instead of ASP.NET Identity — one
   table, easy to reason about, no scaffolded magic. Owner account is seeded
-  (`ahenriquez200528@gmail.com`) and cannot be deleted; owner/admins can add more admins.
+  (`Luxepupsut@gmail.com`) and cannot be deleted; owner/admins can add more admins.
 - **No third-party email API:** plain SMTP via MailKit. Any mailbox for the domain works
   (registrar email, Zoho, etc.). Local dev uses Mailpit so email "just works" offline.
 - **Customer dedupe:** the database enforces one row per email (unique index, lowercase).

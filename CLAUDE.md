@@ -24,7 +24,7 @@ truth for its section and keeps context small:**
   BCrypt, JWT). Migrations auto-apply on startup.
 - Run stack: `docker compose up --build` (API :5080, Postgres :5432, Mailpit UI :8025),
   frontend `npm run dev` (:5173).
-- Seeded owner login: `ahenriquez200528@gmail.com` / env `ADMIN_SEED_PASSWORD`.
+- Seeded owner login: `Luxepupsut@gmail.com` / env `ADMIN_SEED_PASSWORD`.
 - Design rules (public page): keep the existing palette CSS variables, flat aesthetic,
   no new emojis, Playfair Display headings + DM Sans body. See `REDESIGN_SPEC.md`.
 - Emails are stored lowercase everywhere; one Customer row per email — never create a

@@ -41,7 +41,7 @@ services:
       Smtp__UseStartTls: ${Smtp__UseStartTls:-false}
       Smtp__FromAddress: ${Smtp__FromAddress:-noreply@luxepupsutah.com}
       Smtp__FromName: ${Smtp__FromName:-Luxe Pups Grooming}
-      Smtp__OwnerNotificationEmail: ${Smtp__OwnerNotificationEmail:-ahenriquez200528@gmail.com}
+      Smtp__OwnerNotificationEmail: ${Smtp__OwnerNotificationEmail:-Luxepupsut@gmail.com}
       Cors__Origins: ${Cors__Origins:-https://luxepupsutah.com,http://localhost:5173}
     ports:
       - "5080:8080"

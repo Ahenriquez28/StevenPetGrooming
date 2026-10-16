@@ -16,7 +16,7 @@ npm install && npm run dev  # frontend on http://localhost:5173
 | Mailpit (caught emails) | http://localhost:8025 |
 | Postgres | localhost:5432 (`luxepups` / password from `.env`) |
 
-First login: `ahenriquez200528@gmail.com` + the `ADMIN_SEED_PASSWORD` from `.env`.
+First login: `Luxepupsut@gmail.com` + the `ADMIN_SEED_PASSWORD` from `.env`.
 **Change it immediately in production** (the seed password only applies on first boot).
 
 The API auto-applies EF migrations on startup — no manual DB setup.

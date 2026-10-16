@@ -8,7 +8,7 @@ routes = [{ pattern = "api.luxepupsutah.com", custom_domain = true }]
 # Non-secret settings. The Resend key is NOT here — set it with:
 #   npx wrangler secret put RESEND_API_KEY
 [vars]
-OWNER_EMAIL = "ahenriquez200528@gmail.com"
+OWNER_EMAIL = "Luxepupsut@gmail.com"
 OWNER_PHONE = "(201) 978-7960"
 FROM_NAME = "Luxe Pups Grooming"
 FROM_ADDRESS = "noreply@luxepupsutah.com"
