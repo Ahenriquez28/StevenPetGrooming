@@ -1,0 +1,11 @@
+{
+  "name": "Luxe Pups Grooming",
+  "short_name": "Luxe Pups",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "theme_color": "#3D2B1F",
+  "background_color": "#FAF6F0",
+  "display": "browser"
+}

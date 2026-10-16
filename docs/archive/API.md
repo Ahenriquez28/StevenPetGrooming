@@ -1,3 +1,5 @@
+> **ARCHIVED — NOT BUILT.** This describes a planned ASP.NET + Postgres back office that does not exist in this repo. The live system is documented in [../ARCHITECTURE.md](../ARCHITECTURE.md).
+
 # API Contract
 
 Base URL: `/api` (dev: `http://localhost:5080/api`). JSON everywhere.

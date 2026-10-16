@@ -533,22 +533,6 @@ export default function App() {
             <a href="tel:2019787960" className="footer-phone">(201) 978-7960</a>
           </div>
 
-          <div className="footer-links">
-            <h4>Quick Links</h4>
-            <ul>
-              <li><a href="#" onClick={(e) => showPage(e, 'home')}>Home</a></li>
-              <li><a href="#about" onClick={(e) => showPage(e, 'about')}>About Us</a></li>
-              <li><a href="#services" onClick={(e) => scrollTo(e, 'services')}>Grooming Services</a></li>
-              <li><a href="#">Contact Us</a></li>
-              <li><a href="#">Privacy Policy</a></li>
-              <li><a href="#">Press</a></li>
-              <li><a href="#">Podcast</a></li>
-              <li><a href="#">Before &amp; After Gallery</a></li>
-              <li><a href="#booking" onClick={(e) => scrollTo(e, 'booking')}>Book Appointment</a></li>
-              <li><a href="#">Disclaimer</a></li>
-            </ul>
-          </div>
-
           <div className="footer-hours">
             <h4>Hours of Operation</h4>
             <ul>

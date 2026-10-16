@@ -1,3 +1,5 @@
+> **ARCHIVED — NOT BUILT.** This describes a planned ASP.NET + Postgres back office that does not exist in this repo. The live system is documented in [../ARCHITECTURE.md](../ARCHITECTURE.md).
+
 # Docker & Deployment
 
 ## Run everything locally

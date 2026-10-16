@@ -910,7 +910,7 @@ nav ul a:hover { color: var(--gold); }
 }
 .footer-inner {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr;
   gap: 64px;
   max-width: 1200px;
   margin: 0 auto;

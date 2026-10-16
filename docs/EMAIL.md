@@ -1,65 +1,45 @@
 # Email
 
-All email goes through **plain SMTP** (MailKit) — no SendGrid/Mailgun/API keys.
-Implementation: `backend/LuxePups.Api/Services/EmailService.cs`.
+All mail is sent by the Cloudflare Worker through **Resend's HTTP API**
+(`worker/src/index.js`). No SMTP, no mail server.
 
-## What sends email
+## What sends
 
-1. **Booking submitted** (public form):
-   - notification to the business (`Smtp__OwnerNotificationEmail`) with all form fields
-   - confirmation to the customer ("We got your request, we'll reach out to confirm")
-   - both are fire-and-forget: an SMTP failure is logged but never fails the booking API call
-2. **Mass campaigns** (admin → Email tab): one individual message per recipient
-   (recipient's own address in `To:` — never a giant BCC), per-recipient try/catch so one
-   bad address doesn't kill the batch. Results recorded on the EmailCampaign row.
+On each valid `POST /bookings`:
 
-## Configuration (env vars)
+| Email | To | Reply-To | Required to succeed? |
+|---|---|---|---|
+| "New booking request: {name} ({dog})" with all form fields | `OWNER_EMAIL` (Luxepupsut@gmail.com) | the customer | **Yes** — failure returns `502` and the site shows an error |
+| "We got your request — Luxe Pups Grooming" | the customer | `OWNER_EMAIL` | No — best effort, failure is logged |
 
-| Env var | Dev default (docker-compose) | Production |
+Both are sent from `Luxe Pups Grooming <noreply@luxepupsutah.com>`. `noreply@` cannot receive
+mail, which is why `Reply-To` is always set.
+
+## Configuration
+
+| Setting | Where | Value |
 |---|---|---|
-| `Smtp__Host` | `mailpit` | your mail provider's SMTP host |
-| `Smtp__Port` | `1025` | usually `587` |
-| `Smtp__User` / `Smtp__Password` | empty (Mailpit needs none) | mailbox credentials |
-| `Smtp__UseStartTls` | `false` | `true` |
-| `Smtp__FromAddress` | `noreply@luxepupsutah.com` | same |
-| `Smtp__FromName` | `Luxe Pups Grooming` | same |
-| `Smtp__OwnerNotificationEmail` | `Luxepupsut@gmail.com` | the owner's real inbox |
+| `OWNER_EMAIL`, `OWNER_PHONE`, `FROM_NAME`, `FROM_ADDRESS`, `ALLOWED_ORIGINS` | `worker/wrangler.toml` `[vars]` | non-secret; redeploy after editing |
+| `RESEND_API_KEY` | Cloudflare Worker secret | `npx wrangler secret put RESEND_API_KEY` |
+| Local secret | `worker/.dev.vars` (git-ignored) | copy from `.dev.vars.example` |
 
-## Local dev — Mailpit
+To change who gets booking notifications: edit `OWNER_EMAIL`, then `npx wrangler deploy`.
 
-`docker compose up` starts [Mailpit](https://mailpit.axllent.org/): a fake SMTP server that
-catches everything. Open **http://localhost:8025** to see every email the app "sent".
-Nothing ever leaves your machine in dev.
+## Resend setup (one time, done)
 
-## Production — getting SMTP for luxepupsutah.com
+- Domain `luxepupsutah.com` added in Resend and verified through Cloudflare DNS
+  (DKIM TXT on `resend._domainkey`, plus MX/SPF on the `send.` subdomain).
+- These are all **DNS only** (grey cloud) in Cloudflare. They do not touch the apex MX/SPF
+  records that Porkbun email forwarding uses.
 
-Owning the domain isn't enough by itself — you need a mailbox/SMTP service for it.
-Cheapest paths (any of these gives you the 4 values above):
+## Troubleshooting
 
-- **Zoho Mail** free tier (custom domain, SMTP included)
-- Your domain registrar's email offering (Namecheap/GoDaddy/Squarespace all sell one)
-- **Google Workspace** (~$7/user/mo) if he wants Gmail for the business anyway
+| Symptom | Likely cause |
+|---|---|
+| Form shows "We could not send your request" (502) | Resend rejected the send: domain not verified, bad/rotated API key, or Resend quota hit. Check the Resend dashboard → Logs, and `npx wrangler tail` while resubmitting |
+| Form shows "Origin not allowed" (403) | Site served from an origin missing in `ALLOWED_ORIGINS` |
+| "Too many requests" (429) | Same IP sent >5 in a minute |
+| Owner got it, customer didn't | Typo'd address, or it's in spam; confirmation is best-effort |
+| Mail lands in spam | Add a DMARC record; check SPF/DKIM pass in Gmail → Show original |
 
-You'll add a few DNS records (MX, SPF, DKIM) at the registrar — the provider walks you
-through it. Set SPF/DKIM or mass emails will land in spam.
-
-**Deliverability note:** this sends one SMTP message per recipient with a small delay
-between sends. Fine for a small-business list (dozens–hundreds). If the list ever grows
-into thousands, revisit (dedicated sending service or queue).
-
-## Production path: Cloudflare Worker + Resend (no server)
-
-The live site has no backend. `worker/` is a Cloudflare Worker at `api.luxepupsutah.com`
-that handles `POST /bookings` and sends both emails through Resend's HTTP API.
-
-- Security: origin allowlist (`ALLOWED_ORIGINS`), honeypot field, 8 KB body cap, field length
-  limits, HTML escaping, per-IP rate limit (5/min), API key only in Worker secrets.
-- Owner notification goes to `OWNER_EMAIL` (Luxepupsut@gmail.com) with `Reply-To` = customer.
-
-One-time setup:
-1. Resend: add `luxepupsutah.com` as a domain, add the DNS records it lists in Cloudflare DNS
-   (they live on a `send.` subdomain, so Porkbun's apex SPF/MX stay untouched), wait for Verified.
-2. Create a Resend API key, then `cd worker && npm install && npx wrangler secret put RESEND_API_KEY`.
-3. `npx wrangler deploy` (also creates the `api.luxepupsutah.com` DNS record).
-4. GitHub repo variable `VITE_API_URL=https://api.luxepupsutah.com`, then redeploy the site.
-Local: copy `worker/.dev.vars.example` to `worker/.dev.vars`, run `npm run dev` in `worker/`.
+Rotating the key: create a new key in Resend, run the `secret put` command, delete the old key.
