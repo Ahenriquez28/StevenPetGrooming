@@ -33,13 +33,21 @@ export default function BeforeAfterSlider({ beforeSrc, afterSrc, breed }) {
     window.addEventListener('touchend', onEnd)
   }
 
+  const onKeyDown = (e) => {
+    const step = e.shiftKey ? 10 : 2
+    if (e.key === 'ArrowLeft') setSliderPosition((p) => Math.max(0, p - step))
+    else if (e.key === 'ArrowRight') setSliderPosition((p) => Math.min(100, p + step))
+    else return
+    e.preventDefault()
+  }
+
   return (
     <div className="ba-wrapper">
       <div className="ba-card" ref={containerRef}>
-        <img src={beforeSrc} alt="Before grooming" className="ba-img" />
+        <img src={afterSrc} alt="After grooming" className="ba-img" />
         <img
-          src={afterSrc}
-          alt="After grooming"
+          src={beforeSrc}
+          alt="Before grooming"
           className="ba-img ba-after"
           style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
         />
@@ -48,6 +56,13 @@ export default function BeforeAfterSlider({ beforeSrc, afterSrc, breed }) {
           style={{ left: `${sliderPosition}%` }}
           onMouseDown={onMouseDown}
           onTouchStart={onTouchStart}
+          onKeyDown={onKeyDown}
+          tabIndex={0}
+          role="slider"
+          aria-label={`Before and after comparison${breed ? `, ${breed}` : ''}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(sliderPosition)}
         >
           <div className="ba-handle">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

@@ -1,0 +1,22 @@
+name = "luxepups-api"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# Serve the Worker at api.luxepupsutah.com (the domain must be active on Cloudflare).
+routes = [{ pattern = "api.luxepupsutah.com", custom_domain = true }]
+
+# Non-secret settings. The Resend key is NOT here — set it with:
+#   npx wrangler secret put RESEND_API_KEY
+[vars]
+OWNER_EMAIL = "ahenriquez200528@gmail.com"
+OWNER_PHONE = "(201) 978-7960"
+FROM_NAME = "Luxe Pups Grooming"
+FROM_ADDRESS = "noreply@luxepupsutah.com"
+ALLOWED_ORIGINS = "https://luxepupsutah.com,https://www.luxepupsutah.com,http://localhost:5173"
+
+
+# Per-IP rate limit on POST /bookings: 5 requests per 60 seconds.
+[[ratelimits]]
+name = "BOOKING_LIMITER"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }

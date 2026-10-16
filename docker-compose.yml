@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: luxepups-db
+    environment:
+      POSTGRES_DB: luxepups
+      POSTGRES_USER: luxepups
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-luxepups_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - luxepups_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U luxepups -d luxepups"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: luxepups-mailpit
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # web UI to view caught emails
+
+  api:
+    build: ./backend
+    container_name: luxepups-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__Default: "Host=db;Port=5432;Database=luxepups;Username=luxepups;Password=${POSTGRES_PASSWORD:-luxepups_dev}"
+      Jwt__Secret: ${JWT__SECRET:-dev_only_secret_change_me_0123456789abcdef}
+      ADMIN_SEED_PASSWORD: ${ADMIN_SEED_PASSWORD:-LuxePups2026!}
+      Smtp__Host: ${Smtp__Host:-mailpit}
+      Smtp__Port: ${Smtp__Port:-1025}
+      Smtp__User: ${Smtp__User:-}
+      Smtp__Password: ${Smtp__Password:-}
+      Smtp__UseStartTls: ${Smtp__UseStartTls:-false}
+      Smtp__FromAddress: ${Smtp__FromAddress:-noreply@luxepupsutah.com}
+      Smtp__FromName: ${Smtp__FromName:-Luxe Pups Grooming}
+      Smtp__OwnerNotificationEmail: ${Smtp__OwnerNotificationEmail:-ahenriquez200528@gmail.com}
+      Cors__Origins: ${Cors__Origins:-https://luxepupsutah.com,http://localhost:5173}
+    ports:
+      - "5080:8080"
+
+volumes:
+  luxepups_pgdata:
