@@ -3,10 +3,26 @@
 ## What's in place
 
 - `index.html`: title, meta description, canonical URL, Open Graph/Twitter tags, and
-  `LocalBusiness` JSON-LD (name, phone, hours, area served Utah).
+  `LocalBusiness` JSON-LD (name, phone, hours, and every county and town served).
+- **Service areas live in one file: `src/serviceAreas.js`** (counties + towns, plus the phone number).
+  It feeds the on-page "Service Areas" section, and `vite.config.js` injects the same list into the
+  JSON-LD and the `keywords` meta tag at build time. Edit that file to add or remove a county or town.
+- Google ignores the `keywords` meta tag. What actually helps: the visible town/county text,
+  the page title and description, the JSON-LD, and a Google Business Profile listing the same areas.
 - `public/robots.txt` (allows all, points to the sitemap) and `public/sitemap.xml`.
 - Favicon set: `favicon.svg`, `favicon-48.png`, `apple-touch-icon.png`, `icon-192/512.png`,
   `site.webmanifest`. Google shows the favicon in results (needs a multiple of 48px — met).
+
+- **Every page is written out as real HTML at build time** (`npm run build` = browser build, then a
+  server copy of the same app, then `scripts/prerender.mjs`). So `/services/`, `/davis-county/` etc.
+  each have their own title, description, canonical and full text in the HTML, not an empty shell.
+  If you add a page: add it to `src/routes.js` (and `src/App.jsx`) and to `public/sitemap.xml`.
+- **County pages** (`/davis-county/`, `/weber-county/`, `/morgan-county/`, `/salt-lake-county/`): copy in
+  `src/countyCopy.js`, towns from `src/serviceAreas.js`, template in `src/pages/County.jsx`.
+- Canonical URLs and sitemap entries use a trailing slash (`/services/`) because that is how GitHub
+  Pages serves folders.
+- Hero photos and the logo mark are served as small WebP files (`MainDog.webp`, `LogoMark.webp`, ...).
+  The original PNGs stay in `public/` (the social-share image and structured data still use them).
 
 ## Getting on Google (Search Console)
 

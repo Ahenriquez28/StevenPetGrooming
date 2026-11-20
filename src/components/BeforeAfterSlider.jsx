@@ -1,80 +1,87 @@
 import { useState, useRef, useCallback } from 'react'
 
-export default function BeforeAfterSlider({ beforeSrc, afterSrc, breed }) {
-  const [sliderPosition, setSliderPosition] = useState(50)
-  const containerRef = useRef(null)
+// Before/after reveal. The "before" photo sits on top and is clipped from the
+// right, so dragging right shows more of the original coat.
+export default function BeforeAfterSlider({ beforeSrc, afterSrc, breed, caption = true }) {
+  const [pos, setPos] = useState(50)
+  const [touched, setTouched] = useState(false)
+  const cardRef = useRef(null)
 
-  const updatePosition = useCallback((clientX) => {
-    if (!containerRef.current) return
-    const rect = containerRef.current.getBoundingClientRect()
-    const x = clientX - rect.left
-    const pct = Math.min(100, Math.max(0, (x / rect.width) * 100))
-    setSliderPosition(pct)
+  const update = useCallback((clientX) => {
+    const el = cardRef.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const pct = ((clientX - rect.left) / rect.width) * 100
+    setPos(Math.min(100, Math.max(0, pct)))
   }, [])
 
-  const onMouseDown = (e) => {
-    e.preventDefault()
-    const onMove = (e) => updatePosition(e.clientX)
-    const onUp = () => {
-      window.removeEventListener('mousemove', onMove)
-      window.removeEventListener('mouseup', onUp)
-    }
-    window.addEventListener('mousemove', onMove)
-    window.addEventListener('mouseup', onUp)
+  // Pointer events cover mouse, touch and pen. touch-action: pan-y in the CSS
+  // lets the page keep scrolling vertically while a horizontal drag moves the slider.
+  const onPointerDown = (e) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
+    setTouched(true)
+    update(e.clientX)
   }
-
-  const onTouchStart = () => {
-    const onMove = (e) => { e.preventDefault(); updatePosition(e.touches[0].clientX) }
-    const onEnd = () => {
-      window.removeEventListener('touchmove', onMove)
-      window.removeEventListener('touchend', onEnd)
-    }
-    window.addEventListener('touchmove', onMove, { passive: false })
-    window.addEventListener('touchend', onEnd)
+  const onPointerMove = (e) => {
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) update(e.clientX)
   }
 
   const onKeyDown = (e) => {
     const step = e.shiftKey ? 10 : 2
-    if (e.key === 'ArrowLeft') setSliderPosition((p) => Math.max(0, p - step))
-    else if (e.key === 'ArrowRight') setSliderPosition((p) => Math.min(100, p + step))
+    if (e.key === 'ArrowLeft') setPos((p) => Math.max(0, p - step))
+    else if (e.key === 'ArrowRight') setPos((p) => Math.min(100, p + step))
+    else if (e.key === 'Home') setPos(0)
+    else if (e.key === 'End') setPos(100)
     else return
+    setTouched(true)
     e.preventDefault()
   }
 
   return (
-    <div className="ba-wrapper">
-      <div className="ba-card" ref={containerRef}>
-        <img src={afterSrc} alt="After grooming" className="ba-img" />
+    <figure className="ba">
+      <div
+        className="ba-card"
+        ref={cardRef}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+      >
+        <img src={afterSrc} alt="" className="ba-img" loading="lazy" draggable="false" />
         <img
           src={beforeSrc}
-          alt="Before grooming"
-          className="ba-img ba-after"
-          style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
+          alt=""
+          className="ba-img"
+          loading="lazy"
+          draggable="false"
+          style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
         />
+        <span className="ba-tag ba-tag-before">Before</span>
+        <span className="ba-tag ba-tag-after">After</span>
         <div
           className="ba-divider"
-          style={{ left: `${sliderPosition}%` }}
-          onMouseDown={onMouseDown}
-          onTouchStart={onTouchStart}
+          style={{ left: `${pos}%` }}
           onKeyDown={onKeyDown}
           tabIndex={0}
           role="slider"
           aria-label={`Before and after comparison${breed ? `, ${breed}` : ''}`}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-valuenow={Math.round(sliderPosition)}
+          aria-valuenow={Math.round(pos)}
+          aria-valuetext={`${Math.round(pos)}% before`}
         >
-          <div className="ba-handle">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <polyline points="15 18 9 12 15 6" />
-              <polyline points="9 18 3 12 9 6" transform="scale(-1,1) translate(-24,0)" />
+          <span className={`ba-handle${touched ? '' : ' ba-handle--hint'}`}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M9 7l-5 5 5 5" />
+              <path d="M15 7l5 5-5 5" />
             </svg>
-          </div>
+          </span>
         </div>
-        <span className="ba-label ba-label-before">BEFORE</span>
-        <span className="ba-label ba-label-after">AFTER</span>
       </div>
-      {breed && <p className="ba-breed">{breed}</p>}
-    </div>
+      {caption && breed && (
+        <figcaption className="ba-caption">
+          <span className="ba-breed">{breed}</span>
+          <span className="ba-hint">Drag to compare</span>
+        </figcaption>
+      )}
+    </figure>
   )
 }

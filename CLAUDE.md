@@ -14,7 +14,9 @@ requests via Resend. **No server, no database.**
 
 ## Quick facts
 
-- Frontend: Vite + React 19, no TypeScript, everything in `src/App.jsx`. Dev: `npm run dev` (:5173).
+- Frontend: Vite + React 19, no TypeScript. Pages in `src/pages/`, shell + nav + footer in `src/App.jsx`,
+  tiny History-API router in `src/router.jsx`, page list in `src/routes.js`, business info/areas/hours in
+  `src/serviceAreas.js`, content in `src/data.js`. `npm run build` also pre-renders every page (see docs/SEO.md). Dev: `npm run dev` (:5173).
 - API: `worker/` (Cloudflare Worker). Dev: `cd worker && npm run dev` (:8787, secret in `.dev.vars`).
   Deploy: `cd worker && npx wrangler deploy` (manual; the site deploys on push to `main`).
 - `RESEND_API_KEY` is a Worker secret only. Never commit it or put it in `VITE_*`.
